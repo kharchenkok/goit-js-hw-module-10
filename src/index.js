@@ -15,6 +15,8 @@ const Theme = {
 // ======================створення розмітки=================================
 function generateMenuList(elements) {
   const menuItems = elements.map(elem => menuTemplate(elem)).join('');
+  //   const menuItems = menuTemplate(elements)
+  // console.log(menuItems);
   refs.menuList.insertAdjacentHTML('afterbegin', menuItems);
 }
 generateMenuList(menu);
@@ -23,23 +25,32 @@ generateMenuList(menu);
 checkTheme();
 // ==========================функції по зміні теми та перевірці поточної теми======================================
 function switchTheme(e) {
+
+  removeBodyClass(Object.values(Theme));
+
   if (e.target.checked) {
-    refs.body.classList.add(Theme.DARK),
-      refs.body.classList.remove(Theme.LIGHT);
-    localStorage.setItem('userTheme', Theme.DARK);
-    // console.log(localStorage.getItem('userTheme'));
+    addBodyClass(Theme.DARK), 
+    sendData('userTheme', Theme.DARK);
   } else {
-    refs.body.classList.remove(Theme.DARK);
-    refs.body.classList.add(Theme.LIGHT);
-    localStorage.setItem('userTheme', Theme.LIGHT);
+    addBodyClass(Theme.LIGHT);
+    sendData('userTheme', Theme.LIGHT);
   }
+}
+
+function removeBodyClass(arr) {
+  arr.forEach(elem => refs.body.classList.remove(elem));
+}
+function addBodyClass(theme) {
+  refs.body.classList.add(theme);
+}
+function sendData(key, data) {
+  localStorage.setItem(key, data);
 }
 
 function checkTheme() {
   let currentTheme = localStorage.getItem('userTheme');
-  // console.log(currentTheme);
   if (currentTheme) {
-    refs.body.classList.add(currentTheme);
+    addBodyClass(currentTheme);
   }
   if (currentTheme === Theme.DARK) {
     refs.switchInput.checked = true;
@@ -49,7 +60,7 @@ function checkTheme() {
 const images = refs.menuList.querySelectorAll('img');
 
 const observeElem = (entries, observer) => {
-    entries.forEach(entry => {
+  entries.forEach(entry => {
     if (entry.isIntersecting) {
       entry.target.setAttribute('src', entry.target.dataset.fullimage);
       observer.unobserve(entry.target);
